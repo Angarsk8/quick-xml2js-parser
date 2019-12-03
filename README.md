@@ -2,7 +2,7 @@
 
 ## WTH is this?
 
-It's an XML to JSON parser written entirely in Rust, using the [Neon rust-to-js bindings](https://neon-bindings.com/). It's just a silly project of mine that I started because **1)** I've been learning Rust for the past few days and wanted to do something interesting with it **2)** since I'm most of the time coding in JavaScript, I thought it would make sense to learn how to write native modules for NodeJs using Rust (for whenever needed the extra boost in performance) **3)** I'm started to get interested in systems programming (with Rust at the moment) **4)** why not?
+It's an XML to JSON parser written entirely in [Rust](https://www.rust-lang.org/), using the [Neon rust-to-js bindings](https://neon-bindings.com/). It's just a silly project of mine that I started because **1)** I've been learning Rust for the past few days and wanted to do something interesting with it **2)** since I'm most of the time coding in JavaScript, I thought it would make sense to learn how to write native modules for NodeJs using Rust (for whenever needed the extra boost in performance) **3)** I'm started to get interested in systems programming (with Rust at the moment) **4)** why not?
 
 Again, this is just a silly learning project of mine...
 
@@ -10,9 +10,9 @@ Again, this is just a silly learning project of mine...
 
 I ended up implementing the parser two times, just because I didn't know how to tackle the problem initially, so I explored one posible solution and from there iterated into the second: as a result there are two exported named functions, which are documented below:
 
-### indirectParse: `(xmlString: string) => Object`
+### indirectParse: `(xml: string) => Object`
 
-Initially I literally had no idea how to implement the parsing logic, so after thinking for a while I decided to simplify the problem by converting the xml string into a Rust struct first, so that I could represent the input as something easier to inspect and debug. In this first pass the steps ended up looking like this:
+Initially, I literally had no idea how to implement the parsing logic, so after thinking for a while I decided to simplify the problem by converting the xml string into a Rust struct, so that I could represent the input as something easier to inspect and debug. In this first pass the processing steps ended up looking like this:
 
 `String -> Rust struct -> JsObject`.
 
@@ -60,7 +60,7 @@ assert.deepStrictEqual(obj, {
 });
 ```
 
-### directParse: `(xmlString: string) => Object`
+### directParse: `(xml: string) => Object`
 
 After doing the first pass described before and getting more experience with the problem, I decided to get rid of the intermediary step and aimed for a direct `string` to `object` translation, by using just the Neon native types. **The algorithm that I used to solve this problem is pretty much the same I used in the first implementation, basically, I create a temporary traversal stack, which is increased with every new xml tag that is read (using [quick-xml](https://github.com/tafia/quick-xml)) and then decreased whenever that tag is closed, and apply the accumulated object into its parent (while keeping track of things such as arrays of tags, empty tags, etc)**.
 
@@ -92,7 +92,7 @@ assert.deepStrictEqual(obj, {
 npm install
 ```
 
-***Note***: This will not only install the dependencies but also build the neon project, generating a native module in native/index.node
+***Note***: This will not only install the dependencies but also build the neon project, generating a native NodeJs module at the root of the [native](./native) directory.
 
 Open the [playground](./playground/index.js) and play with it.
 
