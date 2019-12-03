@@ -1,0 +1,18 @@
+[package]
+name = "quick-xml2js"
+version = "0.1.0"
+authors = ["Andres Garcia <andresa.garciah621@gmail.com>"]
+license = "MIT"
+build = "build.rs"
+exclude = ["artifacts.json", "index.node"]
+
+[lib]
+name = "quick_xml2js"
+crate-type = ["cdylib"]
+
+[build-dependencies]
+neon-build = "0.3.3"
+
+[dependencies]
+neon = "0.3.3"
+quick-xml = "0.17.0"

@@ -1,0 +1,21 @@
+{
+  "name": "quick-xml2js",
+  "version": "0.1.0",
+  "description": "Quick XML to JS parser written in Rust",
+  "main": "lib/index.js",
+  "author": "Andres Garcia <andresa.garciah621@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "xml2js",
+    "parser",
+    "rust",
+    "neon",
+    "fun"
+  ],
+  "dependencies": {
+    "neon-cli": "^0.3.3"
+  },
+  "scripts": {
+    "install": "neon build --release"
+  }
+}
