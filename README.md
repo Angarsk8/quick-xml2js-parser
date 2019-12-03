@@ -2,7 +2,7 @@
 
 ## WTH is this?
 
-It's an XML to JSON parser written entirely in Rust, using the [Neon rust-to-js bindings](https://neon-bindings.com/). It's just a silly project of mine that I started because **1)** I've been learning Rust for the past few days and wanted to do something interesting with it **2)** since I'm most of the time coding in JavaScript, I thought it would make sense to learn how to write native modules for NodeJs using Rust (for whenever needed the extra boost in performance) **3)** I'm started to get interested into systems level programming (with Rust at the moment) **4)** why not?
+It's an XML to JSON parser written entirely in Rust, using the [Neon rust-to-js bindings](https://neon-bindings.com/). It's just a silly project of mine that I started because **1)** I've been learning Rust for the past few days and wanted to do something interesting with it **2)** since I'm most of the time coding in JavaScript, I thought it would make sense to learn how to write native modules for NodeJs using Rust (for whenever needed the extra boost in performance) **3)** I'm started to get interested in systems programming (with Rust at the moment) **4)** why not?
 
 Again, this is just a silly learning project of mine...
 
@@ -12,7 +12,7 @@ I ended up implementing the parser two times, just because I didn't know how to 
 
 ### indirectParse: `(xmlString: string) => Object`
 
-Initially I literally had no idea how to implement the parsing logic, so after thinking for a while I decided to simplify the problem by converting the xml string to a Rust struct first, so that I could represent the input as something easier to inspect and debug. In this first pass the steps ended up looking like this:
+Initially I literally had no idea how to implement the parsing logic, so after thinking for a while I decided to simplify the problem by converting the xml string into a Rust struct first, so that I could represent the input as something easier to inspect and debug. In this first pass the steps ended up looking like this:
 
 `String -> Rust struct -> JsObject`.
 
