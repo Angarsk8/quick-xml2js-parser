@@ -66,7 +66,7 @@ impl Node {
         .into_iter()
         .fold(Vec::new(), |mut acc_attributes, attribute_result| {
           let attribute = attribute_result.unwrap();
-          let key = std::str::from_utf8(attribute.key).unwrap();
+          let key = str::from_utf8(attribute.key).unwrap();
           let value = attribute.unescape_and_decode_value(&reader).unwrap();
           acc_attributes.push((key.to_owned(), value));
           acc_attributes
@@ -144,7 +144,7 @@ impl FromStr for Node {
 
         Ok(XmlEvent::End(tag_result)) => {
           let current_node = traversal_stack.last().unwrap();
-          let name = std::str::from_utf8(&tag_result.name()).unwrap();
+          let name = str::from_utf8(&tag_result.name()).unwrap();
 
           if current_node.name != name {
             panic!(
