@@ -35,6 +35,4 @@ xml2js.parseString(xmlString, (_, result) => {
   }
 });
 
-
-
-
+console.log(JSON.stringify(rustDirect, null, 4));

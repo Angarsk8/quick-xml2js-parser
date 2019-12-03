@@ -36,18 +36,23 @@ fn insert_value_into_js_object(
   js_value: Handle<JsValue>,
   js_object: &mut JsObject,
 ) {
-  let previous_js_entry = js_object.get(cx, key).unwrap();
+  let same_js_entry = js_object.get(cx, key).unwrap();
 
-  if previous_js_entry.is_a::<JsArray>() {
-    let array = previous_js_entry.downcast::<JsArray>().unwrap();
+  if same_js_entry.is_a::<JsUndefined>() || same_js_entry.is_a::<JsNull>() {
+    js_object.set(cx, key, js_value).unwrap();
+    return;
+  }
+
+  if same_js_entry.is_a::<JsArray>() {
+    let array = same_js_entry.downcast::<JsArray>().unwrap();
     array.set(cx, array.len(), js_value).unwrap();
     return;
   }
 
-  if previous_js_entry.is_a::<JsObject>() || previous_js_entry.is_a::<JsString>() {
+  if same_js_entry.is_a::<JsObject>() || same_js_entry.is_a::<JsString>() {
     let new_js_array = JsArray::new(cx, 2);
 
-    new_js_array.set(cx, 0, previous_js_entry).unwrap();
+    new_js_array.set(cx, 0, same_js_entry).unwrap();
     new_js_array.set(cx, 1, js_value).unwrap();
 
     js_object.set(cx, key, new_js_array).unwrap();
@@ -87,6 +92,7 @@ fn set_attributes_into_js_object<'a>(
     }
 
     let value_result = attribute.unescape_and_decode_value(&reader);
+
     if value_result.is_err() {
       return cx.throw_error::<_, Handle<'a, JsBoolean>>(format!(
         "Failed to parse attribute value at position {}: {}",
@@ -97,6 +103,7 @@ fn set_attributes_into_js_object<'a>(
 
     let value = value_result.unwrap();
     let value_as_js_string = cx.string(&value);
+
     attributes_js_object
       .set(cx, key.unwrap(), value_as_js_string)
       .unwrap();
