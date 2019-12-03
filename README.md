@@ -89,10 +89,12 @@ assert.deepStrictEqual(obj, {
 #### Setup
 
 ```bash
-npm i # this will install the dependencies as well as build the project, generating a native module in native/index.node
+npm install
 ```
 
-Open [playground.js](./playground.js), play with it and that's it.
+***Note***: This will not only install the dependencies but also build the neon project, generating a native module in native/index.node
+
+Open the [playground](./playground/index.js) and play with it.
 
 ### Testing?
 

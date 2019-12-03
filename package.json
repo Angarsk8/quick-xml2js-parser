@@ -16,6 +16,11 @@
     "neon-cli": "^0.3.3"
   },
   "scripts": {
-    "install": "neon build --release"
+    "build:native": "neon build --release",
+    "install": "npm run build:native"
+  },
+  "optionalDependencies": {
+    "fast-xml-parser": "^3.15.0",
+    "xml2js": "^0.4.22"
   }
 }
