@@ -57,32 +57,59 @@ fn insert_value_into_js_object(
   js_object.set(cx, key, js_value).unwrap();
 }
 
-fn set_attributes_into_js_object(
-  cx: &mut FunctionContext,
+fn set_attributes_into_js_object<'a>(
+  cx: &mut FunctionContext<'a>,
   reader: &XmlReader<&[u8]>,
   xml_attributes: XmlAttributes,
   js_object: &mut JsObject,
-) -> bool {
+) -> JsResult<'a, JsBoolean> {
   let mut count = 0u8;
   let attributes_js_object = JsObject::new(cx);
 
   for attribute_result in xml_attributes {
+    if attribute_result.is_err() {
+      return cx.throw_error::<_, Handle<'a, JsBoolean>>(format!(
+        "Failed to parse attribute at position {}: {}",
+        reader.buffer_position(),
+        attribute_result.unwrap_err()
+      ));
+    }
+
     let attribute = attribute_result.unwrap();
-    let key = str::from_utf8(attribute.key).unwrap();
-    let value = attribute.unescape_and_decode_value(&reader).unwrap();
+    let key = str::from_utf8(attribute.key);
+
+    if key.is_err() {
+      return cx.throw_error::<_, Handle<'a, JsBoolean>>(format!(
+        "Failed to parse attribute key at position {}: {}",
+        reader.buffer_position(),
+        key.unwrap_err()
+      ));
+    }
+
+    let value_result = attribute.unescape_and_decode_value(&reader);
+    if value_result.is_err() {
+      return cx.throw_error::<_, Handle<'a, JsBoolean>>(format!(
+        "Failed to parse attribute value at position {}: {}",
+        reader.buffer_position(),
+        value_result.unwrap_err()
+      ));
+    }
+
+    let value = value_result.unwrap();
     let value_as_js_string = cx.string(&value);
     attributes_js_object
-      .set(cx, key, value_as_js_string)
+      .set(cx, key.unwrap(), value_as_js_string)
       .unwrap();
+
     count += 1;
   }
 
   if count > 0 {
     js_object.set(cx, "$", attributes_js_object).unwrap();
-    return true;
+    return Ok(cx.boolean(true));
   }
 
-  return false;
+  return Ok(cx.boolean(false));
 }
 
 pub fn parse(mut cx: FunctionContext) -> JsResult<JsObject> {
@@ -108,7 +135,8 @@ pub fn parse(mut cx: FunctionContext) -> JsResult<JsObject> {
           &reader,
           tag_result.attributes(),
           &mut current_js_object,
-        );
+        )?
+        .value();
 
         let mut current_node_flags = NodeFlags::new();
         current_node_flags.has_attributes = was_set;
@@ -124,7 +152,8 @@ pub fn parse(mut cx: FunctionContext) -> JsResult<JsObject> {
           &reader,
           tag_result.attributes(),
           &mut current_js_object,
-        );
+        )?
+        .value();
 
         parent_node_flags.has_children = true;
 
@@ -173,12 +202,12 @@ pub fn parse(mut cx: FunctionContext) -> JsResult<JsObject> {
           traversal_stack.pop().unwrap();
 
         if removed_node_name != name {
-          panic!(
+          return cx.throw_error(format!(
             "Error at position {}. Expected {}, got {} instead",
             reader.buffer_position(),
             removed_node_name,
             name
-          );
+          ));
         }
 
         let (_, new_current_js_object, new_current_node_flags) =
@@ -207,21 +236,23 @@ pub fn parse(mut cx: FunctionContext) -> JsResult<JsObject> {
         let (last_node_name, last_js_object, _) = traversal_stack.pop().unwrap();
 
         if stack_len > 1 {
-          panic!(
+          return cx.throw_error(format!(
             "Unexpected EOF at {}. Expected closing tag </ {}>",
             reader.buffer_position(),
             last_node_name
-          );
+          ));
         }
 
         return Ok(last_js_object);
       }
 
-      Err(reason) => panic!(
-        "Error at position {}: {:?}",
-        reader.buffer_position(),
-        reason
-      ),
+      Err(reason) => {
+        return cx.throw_error(format!(
+          "Error at position {}: {:?}",
+          reader.buffer_position(),
+          reason
+        ));
+      }
 
       _ => (),
     }
