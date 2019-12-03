@@ -8,11 +8,11 @@ Again, this is just a silly learning project of mine...
 
 ## More details...
 
-I ended up implementing the parser two times, just because I didn't know how to tackle the problem initially, so I explored one posible solution and from there iterated into the second: as result there are two exported named functions, which are documented below:
+I ended up implementing the parser two times, just because I didn't know how to tackle the problem initially, so I explored one posible solution and from there iterated into the second: as a result there are two exported named functions, which are documented below:
 
 ### indirectParse: `(xmlString: string) => Object`
 
-Initially I literally had no idea how to implement the parsing logic, so after thinking for a while I decided to simplify the problem by converting the xml string to a Rust struct first, so that I could represent the input as something easier to inspect and debug. For this first pass the process ended up looking like this:
+Initially I literally had no idea how to implement the parsing logic, so after thinking for a while I decided to simplify the problem by converting the xml string to a Rust struct first, so that I could represent the input as something easier to inspect and debug. In this first pass the steps ended up looking like this:
 
 `String -> Rust struct -> JsObject`.
 
@@ -62,7 +62,7 @@ assert.deepStrictEqual(obj, {
 
 ### directParse: `(xmlString: string) => Object`
 
-After doing the first pass described before and getting more experience with the problem, I decided to get rid of the intermediary step and aimed for a direct `string` to `object` translation, by using just the Neon native types. The algorithm that I used to solve this problem is pretty much the same that I used in the first implementation, basically, I create a temporary traversal stack, which is increased with every new xml tag that is parsed and then decreased whenever that tag is closed, and apply the accumulated object into its parent (while keeping track of things such as arrays of tags, empty tags, etc).
+After doing the first pass described before and getting more experience with the problem, I decided to get rid of the intermediary step and aimed for a direct `string` to `object` translation, by using just the Neon native types. **The algorithm that I used to solve this problem is pretty much the same I used in the first implementation, basically, I create a temporary traversal stack, which is increased with every new xml tag that is read (using [quick-xml](https://github.com/tafia/quick-xml)) and then decreased whenever that tag is closed, and apply the accumulated object into its parent (while keeping track of things such as arrays of tags, empty tags, etc)**.
 
 See full implementation in the [xml_to_js_object](./native/src/xml_to_js_object/mod.rs) module.
 
