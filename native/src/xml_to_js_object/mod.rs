@@ -255,7 +255,7 @@ pub fn parse(mut cx: FunctionContext) -> JsResult<JsObject> {
 
       Err(reason) => {
         return cx.throw_error(format!(
-          "Error at position {}: {:?}",
+          "Error at position {}: {}",
           reader.buffer_position(),
           reason
         ));

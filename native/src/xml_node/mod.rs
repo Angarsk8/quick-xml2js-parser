@@ -175,11 +175,7 @@ impl FromStr for Node {
           return Ok(last_node);
         }
 
-        Err(reason) => panic!(
-          "Error at position {}: {:?}",
-          reader.buffer_position(),
-          reason
-        ),
+        Err(reason) => panic!("Error at position {}: {}", reader.buffer_position(), reason),
 
         _ => (),
       }
